@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-whitegrid')
 
+
 # simulate 100 data points for the particle location
 def simulate_data_points(A, C, Q, R):
 
@@ -64,13 +65,24 @@ def run(A, C, Q, R):
     time_axis = np.asarray([i for i in range(100)])
     plt.plot(time_axis, loc, '-g', label='true position')
 
+    # plot kalmam estimated location vs the real location
     kelman_X = kalman_filter(A, C, Y, Q, R)
     est_loc = np.asarray([x_loc for x_loc, x_vel in kelman_X])
-    plt.plot(time_axis, est_loc, ':b', label='estimate position')
+    plt.plot(time_axis, est_loc, ':b', label='estimated position')
+    plt.legend()
+    plt.ylabel("position")
+    plt.xlabel("time")
 
     plt.show()
 
-
+    # compare between the measurements and kalmam filter estimate
+    y_diff = np.sum((np.asarray(Y).squeeze() - loc)**2)
+    kalman_diff = np.sum((est_loc - loc)**2)
+    print("measurement MSE: " + str(y_diff) + ", Kalman MSE: " + str(kalman_diff))
+    print("\nKalman Filter estimate is better than the direct measurement estimate.\n"
+          "This is an expected outcome since as part of the Kalman filter estimation\n"
+          "the measurement is taken into account as well as the previous location.\n"
+          "Therefore, we use more knowledge which reduce the uncertainty in estimating the next location.")
 
 
 if __name__ == '__main__':
